@@ -1,1 +1,17 @@
-rootProject.name = 'FotA-Backend'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        mavenCentral()
+        // If you use an internal mirror, add it here:
+        // maven { url = uri("https://your-artifactory-or-nexus/repository/maven-central") }
+    }
+}
+
+rootProject.name = "FotA-Backend"
