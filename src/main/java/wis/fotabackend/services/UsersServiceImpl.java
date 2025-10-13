@@ -6,7 +6,6 @@ import wis.fotabackend.domains.Users;
 import wis.fotabackend.repositories.UsersRepository;
 
 import java.time.Instant;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,5 +26,18 @@ public class UsersServiceImpl implements UsersService {
                                 .created_at(Instant.now().toString())
                                 .build()
                 ));
+    }
+
+    @Override
+    public Users add(Users user) {
+        return userRepo.findByCallsignCaseInsensitive(user.getCallsign())
+                .orElseGet(() -> userRepo.save(user));
+    }
+
+    @Override
+    public Users isCorrect(String callsign, String password) {
+        return userRepo.findByCallsignCaseInsensitive(callsign)
+                .filter(u -> u.getPassword_hash() != null && u.getPassword_hash().equals(password))
+                .orElse(null);
     }
 }

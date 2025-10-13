@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // preflight
                         .requestMatchers("/api/**").permitAll()                  // <-- open all API in dev
-                        .anyRequest().denyAll()
+                        .anyRequest().permitAll()
                 )
                 .httpBasic(httpBasic -> httpBasic.disable())               // no auth prompts
                 .formLogin(form -> form.disable());                        // no redirects
