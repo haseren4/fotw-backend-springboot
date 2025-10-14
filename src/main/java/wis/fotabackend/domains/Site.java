@@ -32,9 +32,10 @@ public class Site {
     @Column(name="qth")
     private String qth;
 
-    @Getter    @Setter
-    @Column(name="active")
-    private boolean active;
+    @Getter @Setter
+    @Column(name = "active", columnDefinition = "varchar(5)", length = 5)
+    @Convert(converter = BooleanToStringConverter.class)
+    private Boolean active;
 
     @Getter    @Setter
     @Column(name = "created_by")
