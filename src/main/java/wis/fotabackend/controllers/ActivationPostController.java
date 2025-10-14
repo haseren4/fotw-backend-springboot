@@ -12,6 +12,7 @@ import wis.fotabackend.services.ActivationPostService;
 import wis.fotabackend.services.ActivationPostServiceImpl;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -31,15 +32,15 @@ public class ActivationPostController {
 
     @PostMapping
     public ResponseEntity<ActivationPost> create(@RequestBody CreateActivationPostDTO dto) {
-        Users user = usersRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Unknown user id: " + dto.getUserId()));
+        Users user = usersRepository.findByCallsign(dto.getCallsign())
+                .orElseThrow(() -> new IllegalArgumentException("Unknown callsign: " + dto.getCallsign()));
         Activation activation = activationRepository.findById(dto.getActivationId())
                 .orElseThrow(() -> new IllegalArgumentException("Unknown activation id: " + dto.getActivationId()));
 
         ActivationPost post = new ActivationPost();
         post.setUser(user);
         post.setActivation(activation);
-        post.setPostTime(dto.getPostTime());
+        post.setPostTime(Instant.now().toString());
         post.setTitle(dto.getTitle());
         post.setBody(dto.getBody());
 
@@ -48,10 +49,10 @@ public class ActivationPostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ActivationPost>> list(@RequestParam(required = false) Integer userId,
+    public ResponseEntity<List<ActivationPost>> list(@RequestParam(required = false) String callsign,
                                                      @RequestParam(required = false) Integer activationId) {
-        if (userId != null) {
-            return ResponseEntity.ok(postService.getByUserId(userId));
+        if (callsign != null) {
+            return ResponseEntity.ok(postService.getByUserCallsign(callsign));
         }
         if (activationId != null) {
             return ResponseEntity.ok(postService.getByActivationId(activationId));

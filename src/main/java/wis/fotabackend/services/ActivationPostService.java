@@ -8,5 +8,6 @@ public interface ActivationPostService {
     ActivationPost add(ActivationPost post);
     List<ActivationPost> getAll();
     List<ActivationPost> getByUserId(int userId);
+    List<ActivationPost> getByUserCallsign(String callsign);
     List<ActivationPost> getByActivationId(int activationId);
 }

@@ -12,6 +12,7 @@ import wis.fotabackend.services.ActivationService;
 import wis.fotabackend.services.ActivationServiceImpl;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -31,32 +32,56 @@ public class ActivationController {
 
     @PostMapping
     public ResponseEntity<Activation> create(@RequestBody CreateActivationDTO dto) {
-        Users user = usersRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Unknown user id: " + dto.getUserId()));
+        Users user = usersRepository.findByCallsign(dto.getCallsign())
+                .orElseThrow(() -> new IllegalArgumentException("Unknown callsign: " + dto.getCallsign()));
         Site site = siteRepository.findById(dto.getSiteId())
                 .orElseThrow(() -> new IllegalArgumentException("Unknown site id: " + dto.getSiteId()));
 
         Activation a = new Activation();
         a.setUser(user);
         a.setSite(site);
-        a.setStartTime(dto.getStartTime());
-        a.setEndTime(dto.getEndTime());
+        a.setStartTime(Instant.now().toString());
+
         a.setLogStatus(dto.getLogStatus());
-        a.setSubmittedAt(dto.getSubmittedAt());
+        a.setSubmittedAt(Instant.now().toString());
 
         Activation saved = activationService.add(a);
         return ResponseEntity.created(URI.create("/api/activations/" + saved.getId())).body(saved);
     }
 
     @GetMapping
-    public ResponseEntity<List<Activation>> list(@RequestParam(required = false) Integer userId,
+    public ResponseEntity<List<Activation>> list(@RequestParam(required = false) String callsign,
                                                  @RequestParam(required = false) Integer siteId) {
-        if (userId != null) {
-            return ResponseEntity.ok(activationService.getByUserId(userId));
+        if (callsign != null) {
+            return ResponseEntity.ok(activationService.getByUserCallsign(callsign));
         }
         if (siteId != null) {
             return ResponseEntity.ok(activationService.getBySiteCode(siteId));
         }
         return ResponseEntity.ok(activationService.getAll());
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<Activation> current(@RequestParam String callsign) {
+        return activationService.getCurrentByUserCallsign(callsign)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Activation> end(@PathVariable int id) {
+        try {
+            Activation updated = activationService.endActivation(id);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException notFound) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/current")
+    public ResponseEntity<Activation> endCurrent(@RequestParam String callsign) {
+        return activationService.endCurrentByCallsign(callsign)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }

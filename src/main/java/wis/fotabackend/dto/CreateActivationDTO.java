@@ -5,7 +5,7 @@ import lombok.Setter;
 
 public class CreateActivationDTO {
     @Getter @Setter
-    private int userId;
+    private String callsign;
 
     @Getter @Setter
     private int siteId; // corresponds to site_code

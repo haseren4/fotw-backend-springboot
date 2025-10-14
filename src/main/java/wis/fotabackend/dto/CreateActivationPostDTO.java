@@ -5,7 +5,7 @@ import lombok.Setter;
 
 public class CreateActivationPostDTO {
     @Getter @Setter
-    private int userId;
+    private String callsign;
 
     @Getter @Setter
     private int activationId;

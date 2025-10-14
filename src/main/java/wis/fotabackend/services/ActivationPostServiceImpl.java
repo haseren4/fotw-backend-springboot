@@ -28,6 +28,11 @@ public class ActivationPostServiceImpl implements ActivationPostService {
     }
 
     @Override
+    public List<ActivationPost> getByUserCallsign(String callsign) {
+        return repo.findByUser_Callsign(callsign);
+    }
+
+    @Override
     public List<ActivationPost> getByActivationId(int activationId) {
         return repo.findByActivation_Id(activationId);
     }
