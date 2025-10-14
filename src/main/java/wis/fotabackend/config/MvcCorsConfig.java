@@ -13,7 +13,7 @@ public class MvcCorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:4200")
                 .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(false)  // set true only if you actually send cookies/Authorization
+                .allowCredentials(true)  // Angular uses withCredentials; allow credentialed requests in dev
                 .maxAge(3600);
     }
 }
