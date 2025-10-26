@@ -1,0 +1,27 @@
+# Docker build context exclusions
+
+# Git
+.git
+.gitignore
+
+# IDEs and editors
+.idea
+.vscode
+*.iml
+
+# Build outputs
+build/
+out/
+
+# Gradle caches
+.gradle/
+**/.gradle/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temp
+logs/
+*.log
+tmp/
