@@ -10,10 +10,18 @@ public class MvcCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://www.fortsontheair.com")
+                // Allow production domains (both schemes and with/without www)
+                .allowedOrigins(
+                        "https://www.fortsontheair.com",
+                        "http://www.fortsontheair.com",
+                        "https://fortsontheair.com",
+                        "http://fortsontheair.com",
+                        // Dev origin for Angular CLI
+                        "http://localhost:4200"
+                )
                 .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)  // Angular uses withCredentials; allow credentialed requests in dev
+                .allowCredentials(true)  // Angular uses withCredentials; allow credentialed requests
                 .maxAge(3600);
     }
 }

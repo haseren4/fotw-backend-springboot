@@ -1,5 +1,7 @@
 package wis.fotabackend.controllers;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import wis.fotabackend.dto.DashboardGreeting;
 import wis.fotabackend.services.UsersService;
 import wis.fotabackend.services.UsersServiceImpl;
 
+import java.time.Duration;
 import java.time.Instant;
 
 @RestController
@@ -48,7 +51,19 @@ public class UsersController {
             return ResponseEntity.status(401).build();
         }
         System.out.println("Logging in user: " + user.getCallsign() + " | email: "+ user.getEmail());
-        return ResponseEntity.ok().build();
+
+        // Set a lightweight cookie so the browser can keep the logged-in callsign.
+        // Note: SameSite=None requires Secure; in local HTTP dev this cookie will be ignored by browsers.
+        ResponseCookie cookie = ResponseCookie.from("callsign", user.getCallsign())
+                .httpOnly(false)                 // allow frontend to read if needed
+                .secure(true)                    // required for SameSite=None on modern browsers
+                .sameSite("None")               // allow cross-site cookie with withCredentials
+                .path("/")
+                .maxAge(Duration.ofDays(30))
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     @GetMapping(value = "/dashboard")
