@@ -10,7 +10,9 @@ public class MvcCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
+                .allowedOrigins("http://ec2-54-196-186-197.compute-1.amazonaws.com")
                 .allowedOrigins("http://localhost:4200")
+                .allowedOrigins("http://www.fortificationsontheair.com")
                 .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)  // Angular uses withCredentials; allow credentialed requests in dev
