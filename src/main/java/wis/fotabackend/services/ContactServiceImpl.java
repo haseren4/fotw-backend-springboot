@@ -16,4 +16,14 @@ public class ContactServiceImpl implements ContactService {
     public List<Contact> saveAll(List<Contact> contacts) {
         return repo.saveAll(contacts);
     }
+
+    @Override
+    public List<Contact> getAll() {
+        return repo.findAll();
+    }
+
+    @Override
+    public List<Contact> getByActivationId(int activationId) {
+        return repo.findByActivation_Id(activationId);
+    }
 }
