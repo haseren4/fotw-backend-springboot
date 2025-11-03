@@ -233,6 +233,77 @@ public class ActivationController {
         return ResponseEntity.ok(resp);
     }
 
+    @PostMapping(path = "/adif", consumes = { "multipart/form-data" })
+    public ResponseEntity<Activation> createFromAdif(@RequestParam(name = "site_id") int siteId,
+                                                     @RequestPart("file") MultipartFile file,
+                                                     @RequestParam(required = false) String callsign) {
+        try {
+            if (callsign == null || callsign.trim().isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            String cs = callsign.trim();
+
+            // Resolve user and site
+            Users user = usersRepository.findByCallsign(cs)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown callsign: " + cs));
+            Site site = siteRepository.findById(siteId)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown site id: " + siteId));
+
+            // Parse ADIF
+            String content = new String(file.getBytes(), StandardCharsets.UTF_8);
+            List<Map<String, String>> adifQsos = parseAdif(content);
+
+            // Determine earliest and latest QSO time
+            Instant earliest = null;
+            Instant latest = null;
+            for (Map<String, String> rec : adifQsos) {
+                Instant t = parseAdifDateTimeToInstant(rec.get("qso_date"), rec.get("time_on"));
+                if (t == null) continue;
+                if (earliest == null || t.isBefore(earliest)) earliest = t;
+                if (latest == null || t.isAfter(latest)) latest = t;
+            }
+            if (earliest == null || latest == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Create and save Activation using the derived window
+            Activation activation = new Activation();
+            activation.setUser(user);
+            activation.setSite(site);
+            activation.setStartTime(earliest.toString());
+            activation.setEndTime(latest.toString());
+            activation.setLogStatus("imported");
+            activation.setSubmittedAt(Instant.now().toString());
+            Activation saved = activationService.add(activation);
+
+            // Map all valid QSOs to contacts for this activation
+            List<Contact> contacts = new ArrayList<>();
+            for (Map<String, String> rec : adifQsos) {
+                Instant qsoInstant = parseAdifDateTimeToInstant(rec.get("qso_date"), rec.get("time_on"));
+                if (qsoInstant == null) continue;
+                Contact c = new Contact();
+                c.setActivation(saved);
+                c.setUser(user);
+                c.setCallsignWorked(rec.getOrDefault("call", null));
+                c.setFrequency(rec.getOrDefault("freq", null));
+                c.setMode(rec.getOrDefault("mode", null));
+                c.setSignalReportSent(rec.getOrDefault("rst_sent", null));
+                c.setSignalReportRecv(rec.getOrDefault("rst_rcvd", null));
+                c.setQsoTime(qsoInstant.toString());
+                contacts.add(c);
+            }
+            if (!contacts.isEmpty()) {
+                contactService.saveAll(contacts);
+            }
+
+            return ResponseEntity.created(URI.create("/api/activations/" + saved.getId())).body(saved);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     // --- Minimal ADIF parser ---
     private static List<Map<String, String>> parseAdif(String content) {
         String lower = content.replace("\r", "");
