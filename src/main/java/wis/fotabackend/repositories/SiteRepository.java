@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface SiteRepository extends JpaRepository<Site, Integer> {
     @Query("SELECT s FROM Site s WHERE s.category = ?1")
-    List<Site> getAllByCatagory(String catagory);
+    List<Site> getAllByCategory(String category);
 }

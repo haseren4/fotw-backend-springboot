@@ -7,5 +7,5 @@ import java.util.List;
 public interface SiteService {
     List<Site> getAll();
 
-    List<Site> getAllByCatagory(String catagory);
+    List<Site> getAllByCategory(String category);
 }

@@ -23,8 +23,8 @@ public class SiteController {
         return siteService.getAll();
     }
 
-    @GetMapping(value= "/catagory={catagory}")
-    public List<Site> getAllByCatagory(@PathVariable String catagory){
-        return siteService.getAllByCatagory(catagory);
+    @GetMapping(value= "/category={category}")
+    public List<Site> getAllByCategory(@PathVariable String category){
+        return siteService.getAllByCategory(category);
     }
 }
