@@ -1,6 +1,7 @@
 package wis.fotabackend.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wis.fotabackend.domains.Site;
@@ -20,5 +21,10 @@ public class SiteController {
     @GetMapping(value="/all")
     public List<Site> getAll(){
         return siteService.getAll();
+    }
+
+    @GetMapping(value= "/catagory={catagory}")
+    public List<Site> getAllByCatagory(@PathVariable String catagory){
+        return siteService.getAllByCatagory(catagory);
     }
 }

@@ -17,4 +17,9 @@ public class SiteServiceImpl implements SiteService{
     public List<Site> getAll() {
         return siteRepository.findAll();
     }
+
+    @Override
+    public List<Site> getAllByCatagory(String catagory) {
+        return siteRepository.getAllByCatagory(catagory);
+    }
 }
