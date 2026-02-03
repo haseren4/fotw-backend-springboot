@@ -61,7 +61,13 @@ public class ActivationController {
 
     @GetMapping
     public ResponseEntity<List<Activation>> list(@RequestParam(required = false) String callsign,
-                                                 @RequestParam(required = false) Integer siteId) {
+                                                 @RequestParam(required = false) Integer siteId,
+                                                 @RequestParam(required = false) Integer id) {
+        if (id != null) {
+            return activationService.getById(id)
+                    .map(a -> ResponseEntity.ok(List.of(a)))
+                    .orElseGet(() -> ResponseEntity.ok(List.of()));
+        }
         if (callsign != null) {
             return ResponseEntity.ok(activationService.getByUserCallsign(callsign));
         }
@@ -69,6 +75,13 @@ public class ActivationController {
             return ResponseEntity.ok(activationService.getBySiteCode(siteId));
         }
         return ResponseEntity.ok(activationService.getAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Activation> getById(@PathVariable int id) {
+        return activationService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/current")
@@ -291,6 +304,7 @@ public class ActivationController {
                 c.setSignalReportRecv(rec.getOrDefault("rst_rcvd", null));
                 c.setQsoTime(qsoInstant.toString());
                 contacts.add(c);
+                System.out.println("Contact: " + c + ".");
             }
             if (!contacts.isEmpty()) {
                 contactService.saveAll(contacts);
