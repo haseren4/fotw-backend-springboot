@@ -7,6 +7,7 @@ import wis.fotabackend.domains.Users;
 import wis.fotabackend.repositories.UsersRepository;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +49,11 @@ public class UsersServiceImpl implements UsersService {
         return userRepo.findByCallsignCaseInsensitive(callsign)
                 .filter(u -> passwordMatches(u.getPassword_hash(), password))
                 .orElse(null);
+    }
+
+    @Override
+    public List<Users> getAllByRole(String role) {
+        return userRepo.getAllByRole(role);
     }
 
     private boolean passwordMatches(String storedHash, String rawPassword) {

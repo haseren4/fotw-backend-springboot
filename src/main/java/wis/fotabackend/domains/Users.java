@@ -32,5 +32,8 @@ public class Users {
     @Column(name = "created_at")
     String created_at;
 
+    @Getter@Setter @Nullable
+    @Column(name = "role")
+    String role;
 
 }

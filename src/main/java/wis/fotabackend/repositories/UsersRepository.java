@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import wis.fotabackend.domains.Users;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -17,4 +18,6 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     @Query("select u from Users u where lower(u.callsign) = lower(:callsign)")
     Optional<Users> findByCallsignCaseInsensitive(@Param("callsign") String callsign);
+    @Query("select u from Users u where u.role = 'user'")
+    List<Users> getAllByRole(String role);
 }
